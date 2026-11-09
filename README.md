@@ -48,6 +48,7 @@ Break any of these and the feature misbehaves in ways that are hard to spot by e
 6. The move endpoint returns the **refreshed table partial**, not a status code, not JSON. The server owns the markup.
 7. The swap target wrapper (`<div id="articles-table">`) lives **inside the partial**, so an `outerHTML` swap replaces a complete, self-identifying element.
 8. Every mutating endpoint calls `$this->validation->run()`. In Trongate v2 that call is the only thing that enforces CSRF.
+9. **`priority` is the first column of the table** — first `<th>` in the `<thead>` row and first `<td>` in every row. Lead with it or not at all: do not drop it in beside `title` because that happens to be where the code was easiest to edit. The number is the record's position in the list and the arrows are the feature's one control, so both belong at the left edge, where the eye starts. A priority column in the middle of a row reads as ordinary data and the whole feature looks like an afterthought. This applies to the demo and to every port of it.
 
 ## 3. Database
 
@@ -292,7 +293,7 @@ browser: mx-swap="outerHTML" replaces #articles-table with the response body
 | Insert payload | `['title' => $title]` | Your columns, without `priority` |
 | Controller | `Articles`, `articles/...` URLs | Your module and endpoint names |
 | `$default_limit` | `10` | Your page size (or remove pagination) |
-| `views/table.php` | Priority / Title / Actions | Your columns; keep the priority cell and the wrapper |
+| `views/table.php` | Priority / Title / Actions | Your columns; keep the priority cell **as the first column** and the wrapper |
 | Page shells | `manage.php`, `create.php`, `delete_conf.php` | Your admin template |
 | Schema | 3 columns | Yours + `priority INT NOT NULL` + `UNIQUE` |
 
@@ -303,7 +304,7 @@ browser: mx-swap="outerHTML" replaces #articles-table with the response body
 3. **Insert.** Route every insert through `create_new_record()`, so nothing ever lands in the table without a priority. If your module also creates records elsewhere, fix those paths too.
 4. **Delete.** Route every delete through `delete_record()` so the gap gets closed.
 5. **Controller.** Add `move_up()` / `move_down()` (or one `move()` taking a direction), both calling `handle_move()`-style logic. Share one `get_table_data()` between the page method and the endpoints.
-6. **View.** Keep the wrapper div in the partial, keep `mx-target`/`mx-swap`/`mx-vals` consistent with it, render a `<span>` instead of a link at the bounds, and put every list-shaping parameter into `mx-vals`.
+6. **View.** Keep the wrapper div in the partial, keep `mx-target`/`mx-swap`/`mx-vals` consistent with it, render a `<span>` instead of a link at the bounds, and put every list-shaping parameter into `mx-vals`. Priority is the **first column**, in the header and in every row — see invariant 9.
 7. **Auth.** The demo has none. Wrap the endpoints in whatever check protects the rest of your module.
 
 ## 8. Integration considerations

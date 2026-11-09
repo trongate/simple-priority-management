@@ -59,6 +59,13 @@ Copy `modules/articles/views/table.php`. Three things are load-bearing:
 - `mx-target` names that wrapper; `mx-swap` is `outerHTML`.
 - `mx-vals` carries the CSRF token **and the page number**.
 
+And one thing that is not load-bearing but is the house rule: **priority is the
+first column**, first `<th>` in the header row and first `<td>` in every row.
+The number is the record's position in the list and the arrows are the
+feature's only control, so they sit at the left edge as you would expect. Keep
+the priority cell first when you rename the columns; do not let it drift into
+the middle of the row.
+
 The arrows themselves:
 
 ```php
@@ -102,6 +109,7 @@ check. Then the four checks that actually catch bugs:
 | Move the top row up | Nothing happens; the arrow is a `span`, not a link |
 | Delete a middle row | Remaining rows renumber to `1..N` |
 | POST a move with no CSRF token | Rejected (403 for MX, 302 for plain navigation) |
+| Inspect the table header | `Priority` is the first `<th>`, and each row's first `<td>` is the priority cell |
 
 ## 8. The five mistakes that cost the most time
 
